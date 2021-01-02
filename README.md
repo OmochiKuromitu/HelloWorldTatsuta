@@ -9,3 +9,6 @@ https://pipoya.net/sozai/
 BGM
 https://musmus.main.jp/about.html
 MusMus
+
+セリフ
+http://300.web.hange.info/
