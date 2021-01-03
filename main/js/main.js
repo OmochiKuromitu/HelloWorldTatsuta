@@ -205,6 +205,13 @@ var RANDOM_LINES = [
 
 
 
+var TOTAL_COUNT = 0
+var ITEM_COUNT1 = 0
+var ITEM_COUNT2 = 0
+var ITEM_COUNT3 = 0
+var ITEM_COUNT4 = 0
+var ITEM_COUNT5 = 0
+var ITEM_COUNT6 = 0
 
 // MainScene クラスを定義
 phina.define('MainScene', {
@@ -212,12 +219,6 @@ phina.define('MainScene', {
   init: function() {
     this.superInit();
 
-    // // 背景色を指定
-    // this.backgroundColor = '#444';
-    // // ラベルを生成
-    // this.label = Label('Hello, phina.js!').addChildTo(this);
-    // this.label.x = this.gridX.center(); // x 座標
-    // this.label.y = this.gridY.center(); // y 座標
     this.messagewindow = false; // メッセージウィンドウ表示
 
     // 背景
@@ -230,93 +231,110 @@ phina.define('MainScene', {
     //   fontSize: 24,
     // }).addChildTo(this).setPosition(this.gridX.center(),this.gridY.center());
 
-    this.count = 0
-    // 手に入れた本の数
-    var titleLabelBack = Shape({
-      backgroundColor: 'white',
+    
+    countBack = RectangleShape({
       width: 280,
       height: 50,
-      x: this.gridX.span(3),
-      y: this.gridY.span(1),
-      }).addChildTo(this);
+      fill:"#c4a6ca",
+      stroke:"#d685b0",
+      strokeWidth:5,
+      cornerRadius:15,
+    }).addChildTo(this).setPosition(this.gridX.span(4),this.gridY.span(1));
+
     // ラベル表示
-    Label({
-      text: '買った本の数:',
-      fontSize: 20,
-    }).addChildTo(this).setPosition(this.gridX.span(3),this.gridY.span(1));
     this.countLabel = Label({
-      text: this.count,
+      width: 280,
+      height: 50,
+      text: '買った本の数:' + TOTAL_COUNT + '冊',
+      fill:'#ffff',
       fontSize: 20,
-    }).addChildTo(this).setPosition(this.gridX.span(5),this.gridY.span(1));
-    Label({
-      text: '冊',
-      fontSize: 20,
-    }).addChildTo(this).setPosition(this.gridX.span(6),this.gridY.span(1));
+    }).addChildTo(this).setPosition(this.gridX.span(4),this.gridY.span(1));
+
+        
+    // タッチを有効に
+    var self = this;
+    countBack.setInteractive(true);
+    // タッチイベント
+    countBack.onpointend = function() {
+        // ポーズシーンをpushする
+        self.app.pushScene(MyPauseScene());   
+    };
+
+    // 複数プロパティを同時変更
+    countBack.tweener.clear()
+    .set({alpha: 0, scaleX:0.8, scaleY:0.1})
+    .by({y: 0, alpha: 1, scaleX:0.2, scaleY:0.9}, 800, 'easeOutElastic')
 
     // 再生ボタン作成
-    var playBtn = Shape({
-    backgroundColor: 'red',
-    x: this.gridX.span(10),
-    y: this.gridY.span(15),
-    }).addChildTo(this);
+
+    this.playBtn = RectangleShape({
+      x: this.gridX.span(10),
+      y: this.gridY.span(1),
+      fill:"#f9e697",
+      stroke:"#d685b0",
+      strokeWidth:5,
+      cornerRadius:15,
+    }).addChildTo(this)
     // ラベル表示
     Label({
       text: 'BGM\nSTART',
-      fontSize: 20,
-    }).addChildTo(this).setPosition(this.gridX.span(10),this.gridY.span(15));
-
-    // 音再生
-    SoundManager.playMusic('sound');
+      fontSize: 15,
+    }).addChildTo(this).setPosition(this.gridX.span(10),this.gridY.span(1));
 
     // タッチを有効に
-    playBtn.setInteractive(true);
+    this.playBtn.setInteractive(true);
     // タッチイベント
-    playBtn.onpointend = function() {
-    // 音再生
-    SoundManager.playMusic('sound');
+    this.playBtn.onpointend = function() {
+      // 音再生
+      SoundManager.playMusic('sound');
     };
+
     // 中断ボタン作成
-    var pauseBtn = Shape({
-    backgroundColor: 'blue',
-    x: this.gridX.span(12),
-    y: this.gridY.span(15),
-    }).addChildTo(this);
+    this.pauseBtn = RectangleShape({
+      x: this.gridX.span(12),
+      y: this.gridY.span(1),
+      fill:"#b3d3ac",
+      stroke:"#d685b0",
+      strokeWidth:5,
+      cornerRadius:15,
+    }).addChildTo(this)
 
     // ラベル表示
     Label({
       text: 'BGM\nSTOP',
-      fill: 'white',
-      fontSize: 20,
-    }).addChildTo(this).setPosition(this.gridX.span(12),this.gridY.span(15));
+      fontSize: 15,
+    }).addChildTo(this).setPosition(this.gridX.span(12),this.gridY.span(1));
 
     // タッチを有効に
-    pauseBtn.setInteractive(true);
+    this.pauseBtn.setInteractive(true);
     // タッチイベント
-    pauseBtn.onpointend = function() {
+    this.pauseBtn.onpointend = function() {
     // 一時停止
     SoundManager.pauseMusic();
     };
     // 再開ボタン作成
-    var resumeBtn = Shape({
-    backgroundColor: 'green',
-    x: this.gridX.span(14),
-    y: this.gridY.span(15),
-    }).addChildTo(this);
+    this.resumeBtn = RectangleShape({
+      x: this.gridX.span(14),
+      y: this.gridY.span(1),
+      fill:"#eac7cd",
+      stroke:"#d685b0",
+      strokeWidth:5,
+      cornerRadius:15,
+    }).addChildTo(this)
 
     // ラベル表示
     Label({
       text: 'BGM\nRESUME',
-      fill: 'white',
-      fontSize: 20,
-    }).addChildTo(this).setPosition(this.gridX.span(14),this.gridY.span(15));
+      fontSize: 15,
+    }).addChildTo(this).setPosition(this.gridX.span(14),this.gridY.span(1));
 
     
     // タッチを有効に
-    resumeBtn.setInteractive(true);
+    this.resumeBtn.setInteractive(true);
     // タッチイベント
-    resumeBtn.onpointend = function() {
+    this.resumeBtn.onpointend = function() {
     // 再開
-    SoundManager.resumeMusic();
+      SoundManager.resumeMusic();
     };
 
 
@@ -338,6 +356,25 @@ phina.define('MainScene', {
     .call(function() {
       tb.remove();
     })
+
+    // モバイルでの再生制限アンロックのため、画面タッチ時にSoundを無音再生
+    this.on('enter', function() {
+      var event = "touchstart";
+      var dom = this.app.domElement;
+      dom.addEventListener(event, (function() {
+        return function f() {
+          var context = phina.asset.Sound.getAudioContext();
+          var buf = context.createBuffer(1, 1, 22050);
+          var src = context.createBufferSource();
+          src.buffer = buf;
+          src.connect(context.destination);
+          src.start(0);
+
+          dom.removeEventListener(event, f, false);
+        }
+      }()), false);
+    });
+
 
     // スプライト画像作成
     this.sprite = Sprite('player', 64, 64).addChildTo(this);
@@ -361,7 +398,8 @@ phina.define('MainScene', {
         // 移動先を設定
         this.targetX = e.pointer.x;
         this.targetY = e.pointer.y;
-      };
+        
+    };
     // タッチ保持イベント
     this.onpointmove = function(e) {
       // 移動先を設定
@@ -442,43 +480,14 @@ phina.define('MainScene', {
     this.mob7.y = this.gridY.span(5);
 
 
-    // 手に入れた本の数
-    this.messageLabelBack = RectangleShape({
-      width: window.innerWidth * 0.8,
-      height: 200,
-      x: this.gridX.span(8),
-      y: this.gridY.span(13),
-      backgroundColor:"transparent",
-      fill:"white",
-      stroke:"black",
-      strokeWidth:5,
-      cornerRadius:25
-    }).addChildTo(this);
-    this.messageLabelBack.setInteractive(true);
+    // メッセージとかとか
+    this.messageLabelBack = phina.ui.TalkBubbleLabel({
+      fontSize:30,
+      text: "",
+      tipDirection: 'top',
+    }).setPosition(this.gridX.span(8), this.gridY.span(13)).addChildTo(this);
+    
 
-    this.labelArea = LabelArea({
-      text:'',
-      width: window.innerWidth * 0.8,
-      height: 180,
-      fontSize:FONT_SIZE,
-    }).addChildTo(this)
-    .setPosition(this.gridX.span(8) + 20,this.gridY.span(13) + 20);
-    
-    this.nextTriangle = TriangleShape({
-      fill:'black',
-      stroke:'transparent',
-      radius:FONT_SIZE/2,
-    }).addChildTo(this)
-    .setPosition(this.labelArea.right - 70, this.labelArea.bottom - 25);
-    this.nextTriangle.rotation = 180;
-
-    this.textIndex = 0;
-    this.charIndex = 0;
-    this.textAll = true;
-    
-    this.messageSpeed = MESSAGE_SPEED;
-  
-    
   },
 
   // 更新
@@ -512,41 +521,72 @@ phina.define('MainScene', {
     }
 
     // 矩形判定
+    if (this.sprite.hitTestElement(this.playBtn)){
+      SoundManager.playMusic('sound');
+    }
+
+    if (this.sprite.hitTestElement(this.pauseBtn)){
+      SoundManager.pauseMusic();
+    }
+
+    if (this.sprite.hitTestElement(this.resumeBtn)){
+      SoundManager.resumeMusic();
+    }
+
+    // 矩形判定
     if (this.sprite.hitTestElement(this.mob1) || this.sprite.hitTestElement(this.mob2) || this.sprite.hitTestElement(this.mob3) ||
          this.sprite.hitTestElement(this.mob4) ||this.sprite.hitTestElement(this.mob5) ||this.sprite.hitTestElement(this.mob6) ||
          this.sprite.hitTestElement(this.mob7)) {
       // 拡大量を指定
       if(!this.messageLabelBack.visible){
         console.log("show!!!")
+
+        this.messageLabelBack.text = RANDOM_LINES.pickup();  
+        
+        this.messageLabelBack.adjustToLabelSize();
+
         this.messagewindow = true;
         this.messageLabelBack.alpha = 0;
         this.messageLabelBack.tweener.clear()
         .set({alpha: 0, scaleX:0.8, scaleY:0.1})
         .by({y: 0, alpha: 1, scaleX:0.2, scaleY:0.9}, 800, 'easeOutElastic')
         .wait(2000)
-        // 透明化
-        this.labelArea.alpha = 0;
-        // フェードイン
-        this.labelArea.tweener.fadeIn(500).play();
-        this.messageLabelBack.show();
-        this.labelArea.show();
-        // this.nextTriangle.show();
 
-        this.labelArea.text = RANDOM_LINES.pickup();
-        
-        if(this.textAll){
-          this.nextTriangle.show();
-        }else{
-          this.nextTriangle.hide();
+        this.messageLabelBack.show();
+
+
+        TOTAL_COUNT += 1;
+        this.countLabel.text = '買った本の数:' + TOTAL_COUNT + "冊";
+
+        var itemName = RANDOM_ITEMNAME.pickup()
+        switch (itemName){
+          case 'えっちな' :
+            ITEM_COUNT1 += 1;
+            break;
+          case '健全な' :
+            ITEM_COUNT2 += 1;
+            break;
+          case 'ドスケベな':
+            ITEM_COUNT3 += 1;
+            break;
+          case 'ほっこりする':
+            ITEM_COUNT4 += 1;
+            break;
+          case 'シリアスな':
+            ITEM_COUNT5 += 1;
+            break;
+          case '感動巨編な':
+            ITEM_COUNT6 += 1;
+            break;
+          default:
+            console.log('その他です');
         }
-        this.count += 1;
-        this.countLabel.text = this.count
 
         // 棘付きフキダシ
         var tb = phina.ui.ThornedTalkBubbleLabel({
           bubbleFill: "#EDA9B6",
           fontSize:50,
-          text: RANDOM_ITEMNAME.pickup() + '\n龍田本1冊GET！',
+          text: itemName + '\n龍田本1冊GET！',
         });
         var x = Math.randint(window.innerHeight *0.2, window.innerWidth*0.8);
         var y = Math.randint(window.innerHeight *0.2, window.innerWidth*0.9);
@@ -567,45 +607,9 @@ phina.define('MainScene', {
     }else{
       // 拡大量を指定
       this.messageLabelBack.hide();
-      this.labelArea.hide();
-      this.nextTriangle.hide();
     }
 
 },
-
-  showAllText: function(){
-    this.labelArea.text = RANDOM_LINES.pickup();
-    this.textAll = true;
-    this.charIndex = text.length;
-  },
-  
-  clearText:function(){
-    this.labelArea.text='';
-  },
-  
-  nextText : function(){
-    this.clearText();
-    if(this.texts.length <= ++this.textIndex){
-      this.textIndex = 0;
-    }
-    this.charIndex = 0;
-    this.addChar();
-  },
-  
-  addChar:function(){
-    this.labelArea.text += this.getChar();
-  },
-  
-  getChar:function(){
-    var text = this.texts[this.textIndex];
-    if(text.length <= this.charIndex){
-      this.textAll = true;
-      return '';
-    }else{
-      this.textAll = false;
-      return text[this.charIndex++];
-    }
-  },
 
     //壁より外に行かないようにする
   checkMove : function(){
@@ -628,7 +632,92 @@ phina.define('MainScene', {
   }
 });
 
+/*
+ * ポーズシーン
+ */
+phina.define("MyPauseScene", {
+  // 継承
+  superClass: 'DisplayScene',
+  // コンストラクタ
+  init: function() {
+    // 親クラス初期化
+    this.superInit();
+    // 背景を半透明化
+    this.backgroundColor = 'rgba(0, 0, 0, 0.7)';
 
+    // ラベル表示
+    var total = Label({
+      text: '買った龍田本の数:' + TOTAL_COUNT + '冊',
+      fill:'#ffff',
+      fontSize: 30,
+    }).addChildTo(this).setPosition(this.gridX.center(),this.gridY.center(-5));
+
+    // 複数プロパティを同時変更
+    total.tweener.clear()
+    .set({alpha: 0, scaleX:0.7, scaleY:0.1})
+    .by({y: 0, alpha: 1, scaleX:0.2, scaleY:0.9}, 800, 'easeOutElastic')
+
+    var item1 ;
+    var item2 ;
+    var item3 ;
+    var item4 ;
+    var item5 ;
+    var item6 ;
+    for (  var i = 0;  i < RANDOM_ITEMNAME.length;  i++  ) {
+ 
+      console.log ( RANDOM_ITEMNAME[ i ] );
+      var labelName = 'item' + i
+      var count = 0;
+      switch (i){
+        case 0 :
+          count = ITEM_COUNT1
+          break;
+        case 1 :
+          count = ITEM_COUNT2
+          break;
+        case 2:
+          count = ITEM_COUNT3
+          break;
+        case 3:
+          count = ITEM_COUNT4
+          break;
+        case 4:
+          count = ITEM_COUNT5
+          break;
+        case 5:
+          count = ITEM_COUNT6
+          break;
+        default:
+          console.log('住所はその他です');
+      }
+      
+      labelName = Label({
+        text: RANDOM_ITEMNAME[ i ] + '本：' + count + '冊',
+        fill:'#ffff',
+        fontSize: 25,
+      }).addChildTo(this).setPosition(this.gridX.center(),this.gridY.center(-4 + i));
+
+      // 複数プロパティを同時変更
+      labelName.tweener.clear()
+      .set({alpha: 0, scaleX:0.8, scaleY:0.1})
+      .by({y: 0, alpha: 1, scaleX:0.2, scaleY:0.9}, 800, 'easeOutElastic')
+     }
+
+
+
+    var self = this;
+    // ポーズ解除ボタン    
+    Button({
+      text: '戻るよ',
+      fontSize: 25,
+    }).addChildTo(this)
+      .setPosition(this.gridX.center(), this.gridY.center(5))
+      .onpush = function() {
+        // 自身を取り除く
+        self.exit();    
+      };
+  },
+});
 
 // メイン処理
 phina.main(function() {
